@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThingSpeak Data Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <style>
+        body {
+            background-color: #05052c; /* Modern dark blue background */
+            color: #f1f1f1; /* Light text */
+            font-family: 'Segoe UI', sans-serif; /* Futuristic font */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: medium;
+            color: #6c6d6e; /* Futuristic neon blue for the title */
+            font-size: 2.5rem;
+           
+            margin-bottom: 2rem;
+        }
+
+        table {
+            background-color: #1b1b3a; /* Darker blue for the table background */
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 35px rgba(0, 3, 0, 3.8); /* Smooth shadow effect */
+        }
+
+        th, td {
+            padding: 1.5rem;
+            text-align: center;
+            color: #f1f1f1;
+            font-size: 1.3rem; /* Slightly larger text for futuristic feel */
+        }
+
+        th {
+            background-color: #0b0b0c; /* Slightly darker header */
+            color: #f5f8f8; /* Bright neon blue for headers */
+            text-transform: none;
+            letter-spacing: 0.1em;
+        }
+
+        td {
+            background-color: #212129; /* Slightly lighter for table cells */
+        }
+
+        /* Hover effects for table rows */
+        tbody tr:hover {
+            background-color: #98989e;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #141429;
+            color: #00d4ff;
+            margin-top: 50px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">ThingSpeak Data Dashboard</h1>
+        <!--h2>Maximum Values of Parameters</h2-->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Heart Rate (bpm)</th>
+                    <th>Glucose (mg/dL)</th>
+                    <th>Temperature (°C)</th>
+                    <th>Acetone 
+                        <br>(ppm)</th>
+                </tr>
+            </thead>
+            <tbody id="maxValues">
+                <tr>
+                    <td id="maxTemperature">N/A</td>
+                    <td id="maxAcetone">N/A</td>
+                    <td id="maxGlucose">N/A</td>
+                    <td id="maxHeartRate">N/A</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+   
+    <script>
+        const apiKey = '22Y7RQV830Q7FQWG'; // Replace with your Read API key
+        const channelId = '2578491'; // Replace with your Channel ID
+
+        async function fetchData() {
+            const response = await fetch(`https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${apiKey}&results=100`);
+            const data = await response.json();
+            return data.feeds;
+        }
+
+        function calculateMaxValues(feeds) {
+            let maxTemperature = -Infinity;
+            let maxAcetone = -Infinity;
+            let maxGlucose = -Infinity;
+            let maxHeartRate = -Infinity;
+
+            feeds.forEach(feed => {
+                const temperature = parseFloat(feed.field1);
+                const acetone = parseFloat(feed.field2);
+                const glucose = parseFloat(feed.field3);
+                const heartRate = parseFloat(feed.field4);
+
+                // Check for valid numbers and calculate max values
+                if (!isNaN(temperature)) maxTemperature = Math.max(maxTemperature, temperature);
+                if (!isNaN(acetone)) maxAcetone = Math.max(maxAcetone, acetone);
+                if (!isNaN(glucose)) maxGlucose = Math.max(maxGlucose, glucose);
+                if (!isNaN(heartRate)) maxHeartRate = Math.max(maxHeartRate, heartRate);
+            });
+
+            return {
+                maxTemperature: maxTemperature === -Infinity ? 'N/A' : maxTemperature,
+                maxAcetone: maxAcetone === -Infinity ? 'N/A' : maxAcetone,
+                maxGlucose: maxGlucose === -Infinity ? 'N/A' : maxGlucose,
+                maxHeartRate: maxHeartRate === -Infinity ? 'N/A' : maxHeartRate,
+            };
+        }
+
+        function displayMaxValues(maxValues) {
+            document.getElementById('maxTemperature').textContent = maxValues.maxTemperature;
+            document.getElementById('maxAcetone').textContent = maxValues.maxAcetone;
+            document.getElementById('maxGlucose').textContent = maxValues.maxGlucose;
+            document.getElementById('maxHeartRate').textContent = maxValues.maxHeartRate;
+        }
+
+        async function init() {
+            try {
+                const feeds = await fetchData();
+                const maxValues = calculateMaxValues(feeds);
+                displayMaxValues(maxValues);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>  
