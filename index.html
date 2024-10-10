@@ -161,12 +161,13 @@
             }
         }
         
-        // Initial data fetch after the script is loaded
-        document.addEventListener('DOMContentLoaded', (event) => {
-        updateDashboard();
-        // Set interval to periodically fetch new data
-        setInterval(updateDashboard, fetchInterval);
-              });
+       // Initial data fetch after the script is loaded
+document.addEventListener('DOMContentLoaded', (event) => {
+    init(); // Call the correct function 'init' to fetch and display the data
+    // Set interval to periodically fetch new data
+    setInterval(init, fetchInterval);
+});
+
     </script>
 </body>
 </html>  
