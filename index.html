@@ -110,6 +110,7 @@
         async function fetchData() {
             const response = await fetch(`https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${apiKey}&results=100`);
             const data = await response.json();
+            console.log("Raw feeds: ", data.feeds); // Log raw data for debugging
             return data.feeds;
         }
 
@@ -124,6 +125,8 @@
                 const acetone = parseFloat(feed.field2);
                 const glucose = parseFloat(feed.field3);
                 const heartRate = parseFloat(feed.field4);
+
+                console.log(`Feed data: Temp: ${temperature}, Acetone: ${acetone}, Glucose: ${glucose}, Heart Rate: ${heartRate}`); // Debugging
 
                 // Check for valid numbers and calculate max values
                 if (!isNaN(temperature)) maxTemperature = Math.max(maxTemperature, temperature);
@@ -141,6 +144,7 @@
         }
 
         function displayMaxValues(maxValues) {
+             console.log("Max values calculated: ", maxValues); // Log calculated max values
             document.getElementById('maxTemperature').textContent = maxValues.maxTemperature;
             document.getElementById('maxAcetone').textContent = maxValues.maxAcetone;
             document.getElementById('maxGlucose').textContent = maxValues.maxGlucose;
