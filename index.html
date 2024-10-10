@@ -160,10 +160,13 @@
                 console.error('Error fetching data:', error);
             }
         }
-        // Initial data fetch
+        
+        // Initial data fetch after the script is loaded
+        document.addEventListener('DOMContentLoaded', (event) => {
         updateDashboard();
         // Set interval to periodically fetch new data
         setInterval(updateDashboard, fetchInterval);
+              });
     </script>
 </body>
 </html>  
